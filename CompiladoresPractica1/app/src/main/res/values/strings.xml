@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">CompiladoresPractica1</string>
+    <string name="example_code"><![CDATA[# Ejemplo de algoritmo
+INICIO
+VAR a = 10
+VAR b = 20
+SI (a < b) ENTONCES
+MOSTRAR "a es menor que b"
+FINSI
+MIENTRAS (a < 15) HACER
+a = a + 1
+MOSTRAR a
+FINMIENTRAS
+MOSTRAR "Fin del programa"
+FIN
+%%%%
+%DEFAULT=1
+%COLOR_TEXTO_SI=12,45-5,1|1
+%FIGURA_MIENTRAS=CIRCULO|1
+%DEFAULT=3]]></string>
+</resources>
