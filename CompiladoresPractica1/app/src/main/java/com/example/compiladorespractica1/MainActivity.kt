@@ -11,6 +11,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var inputEditText: EditText
     private lateinit var analyzeButton: Button
+    private lateinit var clearButton: Button
     private lateinit var resultsTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,14 +21,22 @@ class MainActivity : AppCompatActivity() {
         // Inicializar vistas
         inputEditText = findViewById(R.id.inputEditText)
         analyzeButton = findViewById(R.id.analyzeButton)
+        clearButton = findViewById(R.id.clearButton)
         resultsTextView = findViewById(R.id.resultsTextView)
 
         // Configurar texto de ejemplo
         inputEditText.setText(getString(R.string.example_code))
 
-        // Configurar botón de análisis
+        // Configurar botón de análisis (pendiente de implementar)
         analyzeButton.setOnClickListener {
             analyzeCode()
+        }
+
+        // Configurar botón de limpiar
+        clearButton.setOnClickListener {
+            inputEditText.text.clear()
+            resultsTextView.text = "Aquí se mostrarán los resultados..."
+            Toast.makeText(this, "Texto limpiado", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -39,30 +48,18 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // Mostrar mensaje de procesamiento
-        resultsTextView.text = "Procesando análisis...\n"
-
-        try {
-            // Aquí integraremos el lexer y parser
-            // Por ahora solo mostramos el texto ingresado
-            val result = """
-                === ANÁLISIS RECIBIDO ===
-                
-                Longitud: ${code.length} caracteres
-                
-                Primeros 100 caracteres:
-                ${code.take(100)}
-                
-                ${if (code.length > 100) "..." else ""}
-                
-                Próximamente: Integración con JFlex y CUP
-            """.trimIndent()
-
-            resultsTextView.text = result
-
-        } catch (e: Exception) {
-            resultsTextView.text = "Error durante el análisis:\n${e.message}"
-            e.printStackTrace()
-        }
+        // Mostrar mensaje de procesamiento (temporal)
+        resultsTextView.text = """
+            === ANÁLISIS RECIBIDO ===
+            
+            Longitud: ${code.length} caracteres
+            
+            Primeros 100 caracteres:
+            ${code.take(100)}
+            
+            ${if (code.length > 100) "..." else ""}
+            
+            Próximamente: Integración con JFlex y CUP
+        """.trimIndent()
     }
 }
