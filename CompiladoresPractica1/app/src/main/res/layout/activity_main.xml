@@ -7,18 +7,49 @@
     android:background="#1B1B1B"
     tools:context=".MainActivity">
 
+    <!-- Título principal de la práctica -->
+    <TextView
+        android:id="@+id/practiceTitleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="PRACTICA1"
+        android:textColor="#4ECDC4"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/studentIdTextView"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Carné del estudiante -->
+    <TextView
+        android:id="@+id/studentIdTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        android:text="202231338"
+        android:textColor="#4ECDC4"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/practiceTitleTextView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Título secundario -->
     <TextView
         android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="16dp"
         android:text="Analizador Léxico y Sintáctico"
+        android:textColor="#E0E0E0"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/practiceTitleTextView" />
 
     <TextView
         android:id="@+id/inputLabel"
@@ -27,6 +58,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:text="Ingresa el código a analizar:"
+        android:textColor="#E0E0E0"
         android:textSize="16sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/titleTextView" />
@@ -38,7 +70,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:background="@android:drawable/editbox_background"
+        android:background="@drawable/edittext_background"
         android:padding="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -48,28 +80,57 @@
             android:id="@+id/inputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
             android:gravity="top"
             android:hint="Escribe aquí tu código..."
             android:inputType="textMultiLine"
             android:minLines="8"
-            android:textColor="#1A1212"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#808080"
             android:textSize="14sp" />
     </ScrollView>
 
-    <Button
-        android:id="@+id/analyzeButton"
-        android:layout_width="wrap_content"
+    <!-- Botones en horizontal -->
+    <LinearLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:paddingStart="32dp"
-        android:paddingEnd="32dp"
-        android:text="Analizar"
-        android:textColorLink="#27C3B4"
-        android:textSize="18sp"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:weightSum="2"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/inputScrollView"
-        app:rippleColor="#1EBFD3" />
+        app:layout_constraintTop_toBottomOf="@id/inputScrollView">
+
+        <!-- Botón Analizar (Cyan) -->
+        <Button
+            android:id="@+id/analyzeButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:backgroundTint="#4ECDC4"
+            android:text="Analizar"
+            android:textColor="#1B1B1B"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Botón Limpiar (Cyan) -->
+        <Button
+            android:id="@+id/clearButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:backgroundTint="#4ECDC4"
+            android:text="Limpiar"
+            android:textColor="#1B1B1B"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/resultsLabel"
@@ -78,10 +139,11 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:text="Resultados:"
+        android:textColor="#E0E0E0"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/analyzeButton" />
+        app:layout_constraintTop_toBottomOf="@id/buttonLayout" />
 
     <ScrollView
         android:id="@+id/resultsScrollView"
@@ -91,7 +153,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:background="@android:drawable/editbox_background"
+        android:background="@drawable/edittext_background"
         android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -103,7 +165,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Aquí se mostrarán los resultados..."
-            android:textColorLink="#1F1919"
+            android:textColor="#FFFFFF"
             android:textSize="14sp" />
     </ScrollView>
 
