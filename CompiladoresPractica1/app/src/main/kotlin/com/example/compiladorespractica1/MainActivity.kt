@@ -1,6 +1,7 @@
 package com.example.compiladorespractica1
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -9,6 +10,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.compiladorespractica1.adapter.ErrorAdapter
+import com.example.compiladorespractica1.analyzer.LexerAnalyzer
+import com.example.compiladorespractica1.analyzer.ParserAnalyzer
+import com.example.compiladorespractica1.analyzer.models.TokenInfo
+import com.example.compiladorespractica1.analyzer.models.ErrorInfo
 
 class MainActivity : AppCompatActivity() {
 
@@ -67,33 +73,23 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // Limpiar resultados anteriores
         resultsTextView.text = ""
         errorAdapter.clearErrors()
         errorRecyclerView.visibility = View.GONE
 
-        // ============================================
-        // ANÁLISIS LÉXICO
-        // ============================================
         val lexerResult = lexerAnalyzer.analyze(code)
+        Log.d("DEBUG", "Lexer: tokens=${lexerResult.tokens.size}, errores=${lexerResult.errores.size}, success=${lexerResult.success}")
 
-        // ============================================
-        // ANÁLISIS SINTÁCTICO (solo si no hay errores léxicos)
-        // ============================================
         val parserResult = if (lexerResult.success) {
             parserAnalyzer.analyze(code)
         } else {
-            parserAnalyzer.ParserResult(emptyList(), false)
+            ParserAnalyzer.ParserResult(emptyList(), false)
         }
+        Log.d("DEBUG", "Parser: errores=${parserResult.errores.size}, success=${parserResult.success}")
 
-        // ============================================
-        // COMBINAR ERRORES
-        // ============================================
         val todosLosErrores = lexerResult.errores + parserResult.errores
+        Log.d("DEBUG", "Total errores=${todosLosErrores.size}")
 
-        // ============================================
-        // MOSTRAR RESULTADOS
-        // ============================================
         if (todosLosErrores.isEmpty()) {
             showSuccessResult(lexerResult.tokens)
         } else {
@@ -101,13 +97,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showSuccessResult(tokens: List<LexerAnalyzer.TokenInfo>) {
+    private fun showSuccessResult(tokens: List<TokenInfo>) {
         val tokenList = tokens.joinToString("\n") { token ->
             "  ${token.linea}:${token.columna} - ${token.nombre} (${token.valor})"
         }
 
         resultsTextView.text = """
-            ✅ ANÁLISIS EXITOSO
+            ANÁLISIS EXITOSO
             
             Tokens encontrados: ${tokens.size}
             
@@ -121,8 +117,40 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showErrorResult(errores: List<ErrorInfo>) {
-        errorAdapter.submitList(errores)
+        Log.d("DEBUG", "=== showErrorResult INICIADO ===")
+        Log.d("DEBUG", "Número de errores recibidos: ${errores.size}")
+
+        if (!::errorAdapter.isInitialized) {
+            Log.e("DEBUG", "ERROR: errorAdapter no inicializado")
+            return
+        }
+        if (!::errorRecyclerView.isInitialized) {
+            Log.e("DEBUG", "ERROR: errorRecyclerView no inicializado")
+            return
+        }
+
+        errores.forEachIndexed { index, error ->
+            Log.d("DEBUG", "Error[$index]: tipo=${error.tipo}, línea=${error.linea}, col=${error.columna}, token=${error.token}, mensaje=${error.mensaje}")
+        }
+
+        try {
+            errorAdapter.submitList(errores)
+            Log.d("DEBUG", "submitList ejecutado correctamente")
+        } catch (e: Exception) {
+            Log.e("DEBUG", "Excepción en submitList: ${e.message}")
+        }
+
         errorRecyclerView.visibility = View.VISIBLE
-        resultsTextView.text = "❌ SE ENCONTRARON ${errores.size} ERROR(ES)"
+        Log.d("DEBUG", "RecyclerView visibility cambiado a VISIBLE")
+
+        resultsTextView.text = "SE ENCONTRARON ${errores.size} ERROR(ES)"
+        Log.d("DEBUG", "Texto de resultados actualizado")
+
+        errorRecyclerView.post {
+            errorRecyclerView.requestLayout()
+            Log.d("DEBUG", "requestLayout ejecutado en RecyclerView")
+        }
+
+        Log.d("DEBUG", "=== showErrorResult FINALIZADO ===")
     }
 }
