@@ -4,6 +4,8 @@ import com.example.compiladorespractica1.analyzer.models.ErrorInfo
 import com.example.compiladorespractica1.analyzer.models.TokenInfo
 import com.example.compiladorespractica1.utils.TokenHelper
 import java.io.StringReader
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
 import lexer.Lexer
 import lexer.sym
 import java_cup.runtime.ComplexSymbolFactory
@@ -24,12 +26,17 @@ class LexerAnalyzer {
         val tokens = mutableListOf<TokenInfo>()
         val errores = mutableListOf<ErrorInfo>()
 
+        val originalOut = System.out
+        val baos = ByteArrayOutputStream()
+        val ps = PrintStream(baos)
+        System.setOut(ps)
+
         try {
             var token: Symbol? = lexer.next_token()
             while (token != null && token.sym != sym.EOF) {
                 val tokenName = TokenHelper.getTokenName(token.sym)
-                val linea = lexer.getLine();
-                val columna = lexer.getColumn();
+                val linea = lexer.getLine()
+                val columna = lexer.getColumn()
                 val valor = token.value?.toString() ?: "-"
 
                 tokens.add(
@@ -53,6 +60,44 @@ class LexerAnalyzer {
                     token = ""
                 )
             )
+        } finally {
+            System.setOut(originalOut)
+        }
+
+        val output = baos.toString()
+        if (output.isNotEmpty()) {
+            val lineas = output.split("\n")
+            for (linea in lineas) {
+                if (linea.contains("Error léxico:")) {
+                    // Extraer información del error
+                    val match = Regex("Error léxico: (.) en línea (\\d+), columna (\\d+)").find(linea)
+                    if (match != null) {
+                        val caracter = match.groupValues[1]
+                        val lineaNum = match.groupValues[2].toInt()
+                        val columnaNum = match.groupValues[3].toInt()
+
+                        errores.add(
+                            ErrorInfo(
+                                tipo = "LÉXICO",
+                                mensaje = "Caracter no válido: '$caracter'",
+                                linea = lineaNum,
+                                columna = columnaNum,
+                                token = caracter
+                            )
+                        )
+                    } else {
+                        errores.add(
+                            ErrorInfo(
+                                tipo = "LÉXICO",
+                                mensaje = linea,
+                                linea = 0,
+                                columna = 0,
+                                token = ""
+                            )
+                        )
+                    }
+                }
+            }
         }
 
         return LexerResult(

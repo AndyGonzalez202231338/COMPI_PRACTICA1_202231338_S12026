@@ -158,51 +158,135 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/resultsLabel">
 
+        <!-- ScrollView para el diagrama de flujo -->
+        <ScrollView
+            android:id="@+id/diagramScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="gone"
+            android:fillViewport="true"
+            android:scrollbars="vertical"
+            android:background="@drawable/edittext_background"
+            android:layout_marginBottom="16dp">
+
+            <com.example.compiladorespractica1.views.DiagramCanvas
+                android:id="@+id/diagramCanvas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="200dp"
+                android:padding="16dp" />
+        </ScrollView>
+
+        <!-- Título del reporte de operadores -->
+        <TextView
+            android:id="@+id/reporteTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="REPORTE DE OPERADORES MATEMÁTICOS"
+            android:textColor="#4ECDC4"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="8dp"
+            android:visibility="visible" />
+
+        <!-- Encabezado de la tabla de operadores -->
+        <LinearLayout
+            android:id="@+id/operadoresHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:background="#3D3D3D"
+            android:layout_marginBottom="4dp"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Operador"
+                android:textColor="#4ECDC4"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Línea"
+                android:textColor="#4ECDC4"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Columna"
+                android:textColor="#4ECDC4"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="Contexto"
+                android:textColor="#4ECDC4"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <!-- RecyclerView para operadores -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/operadoresRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:nestedScrollingEnabled="false"
+            android:visibility="visible" />
+
+        <!-- Título de errores sintácticos -->
+        <TextView
+            android:id="@+id/erroresTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ERRORES SINTÁCTICOS"
+            android:textColor="#FF6B6B"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone" />
+
         <!-- RecyclerView para errores -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/errorRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:visibility="gone"
-            android:background="@drawable/edittext_background"
-            android:layout_marginBottom="8dp" />
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:nestedScrollingEnabled="false"
+            android:visibility="gone" />
 
-        <!-- ScrollView para el diagrama de flujo (permite desplazamiento vertical) -->
-        <ScrollView
-	    android:id="@+id/diagramScrollView"
-	    android:layout_width="match_parent"
-	    android:layout_height="0dp"
-	    android:layout_weight="1"
-	    android:visibility="gone"
-	    android:fillViewport="true"
-	    android:scrollbars="vertical">
-
-	    <com.example.compiladorespractica1.views.DiagramCanvas
-		android:id="@+id/diagramCanvas"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:padding="16dp" />
-
-	</ScrollView>
-
-        <!-- ScrollView para resultados (tokens) -->
-        <ScrollView
-            android:id="@+id/resultsScrollView"
+        <!-- Visualización del código analizado -->
+        <TextView
+            android:id="@+id/codeVisualization"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:visibility="visible"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#E0E0E0"
+            android:textSize="14sp"
+            android:fontFamily="monospace"
             android:background="@drawable/edittext_background"
-            android:padding="8dp">
-
-            <TextView
-                android:id="@+id/resultsTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Aquí se mostrarán los resultados..."
-                android:textColor="#FFFFFF"
-                android:textSize="14sp" />
-        </ScrollView>
+            android:padding="12dp"
+            android:layout_marginTop="8dp"
+            android:visibility="visible" />
 
     </LinearLayout>
 

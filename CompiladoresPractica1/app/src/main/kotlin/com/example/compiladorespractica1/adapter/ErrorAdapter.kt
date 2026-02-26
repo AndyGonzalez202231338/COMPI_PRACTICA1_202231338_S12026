@@ -27,14 +27,18 @@ class ErrorAdapter : RecyclerView.Adapter<ErrorAdapter.ErrorViewHolder>() {
             columnaText.text = error.columna.toString()
             tokenText.text = error.token
 
-            // Dar colores de fondo para ver si se renderizan
-            tipoText.setBackgroundColor(android.graphics.Color.RED)
-            mensajeText.setBackgroundColor(android.graphics.Color.YELLOW)
-            lineaText.setBackgroundColor(android.graphics.Color.LTGRAY)
-            columnaText.setBackgroundColor(android.graphics.Color.LTGRAY)
-            tokenText.setBackgroundColor(android.graphics.Color.CYAN)
+            tipoText.setBackgroundColor(android.graphics.Color.parseColor("#FF6B6B"))
+            mensajeText.setBackgroundColor(android.graphics.Color.parseColor("#4ECDC4"))
+            lineaText.setBackgroundColor(android.graphics.Color.parseColor("#95A5A6"))
+            columnaText.setBackgroundColor(android.graphics.Color.parseColor("#95A5A6"))
+            tokenText.setBackgroundColor(android.graphics.Color.parseColor("#F39C12"))
 
-            Log.d("DEBUG", "Binding error: ${error.tipo} en línea ${error.linea}")
+            tipoText.setTextColor(android.graphics.Color.BLACK)
+            mensajeText.setTextColor(android.graphics.Color.BLACK)
+            lineaText.setTextColor(android.graphics.Color.BLACK)
+            columnaText.setTextColor(android.graphics.Color.BLACK)
+            tokenText.setTextColor(android.graphics.Color.BLACK)
+
         }
     }
 
@@ -45,21 +49,17 @@ class ErrorAdapter : RecyclerView.Adapter<ErrorAdapter.ErrorViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ErrorViewHolder, position: Int) {
-        Log.d("DEBUG", "onBindViewHolder posición $position")
         holder.bind(errores[position])
     }
 
     override fun getItemCount() = errores.size
 
     fun submitList(list: List<ErrorInfo>) {
-        Log.d("DEBUG", "ErrorAdapter.submitList recibió ${list.size} errores")
         errores = list
         notifyDataSetChanged()
-        Log.d("DEBUG", "notifyDataSetChanged llamado")
     }
 
     fun clearErrors() {
-        Log.d("DEBUG", "clearErrors")
         errores = emptyList()
         notifyDataSetChanged()
     }
