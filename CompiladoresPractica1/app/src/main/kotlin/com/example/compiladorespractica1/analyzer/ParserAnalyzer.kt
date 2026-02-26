@@ -4,6 +4,7 @@ import com.example.compiladorespractica1.analyzer.models.ErrorInfo
 import java.io.StringReader
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import android.util.Log
 import lexer.Lexer
 import lexer.Parser
 import java_cup.runtime.ComplexSymbolFactory
@@ -16,6 +17,7 @@ class ParserAnalyzer {
     )
 
     fun analyze(input: String): ParserResult {
+        Log.d("PARSER", "Iniciando análisis sintáctico")
         val sf = ComplexSymbolFactory()
         val lexer = Lexer(StringReader(input), sf)
         val parser = Parser(lexer, sf)
@@ -28,10 +30,13 @@ class ParserAnalyzer {
         System.setErr(ps)
 
         try {
+            Log.d("PARSER", "Llamando a parser.parse()")
             parser.parse()
+            Log.d("PARSER", "parser.parse() terminó normalmente")
         } catch (e: Exception) {
             // Ignorar errores de casteo
             if (!e.message?.contains("cannot be cast to", ignoreCase = true)!!) {
+                Log.d("PARSER", "Excepción en parser.parse(): ${e.message}")
                 errores.add(
                     ErrorInfo(
                         tipo = "SINTÁCTICO",
@@ -44,6 +49,7 @@ class ParserAnalyzer {
             }
         } finally {
             System.setErr(originalErr)
+            Log.d("PARSER", "Restaurado System.err")
         }
 
         // Procesar la salida capturada

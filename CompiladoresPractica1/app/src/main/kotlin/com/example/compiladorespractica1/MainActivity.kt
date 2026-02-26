@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import android.widget.ScrollView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,6 +16,9 @@ import com.example.compiladorespractica1.analyzer.LexerAnalyzer
 import com.example.compiladorespractica1.analyzer.ParserAnalyzer
 import com.example.compiladorespractica1.analyzer.models.TokenInfo
 import com.example.compiladorespractica1.analyzer.models.ErrorInfo
+import com.example.compiladorespractica1.processor.DiagramGenerator
+import com.example.compiladorespractica1.processor.ConfigProcessor
+import com.example.compiladorespractica1.views.DiagramCanvas
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,10 +27,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var clearButton: Button
     private lateinit var resultsTextView: TextView
     private lateinit var errorRecyclerView: RecyclerView
+    private lateinit var diagramCanvas: DiagramCanvas
+    private lateinit var diagramScrollView: ScrollView
+    private lateinit var resultsScrollView: ScrollView
     private lateinit var errorAdapter: ErrorAdapter
 
     private val lexerAnalyzer = LexerAnalyzer()
     private val parserAnalyzer = ParserAnalyzer()
+    private val diagramGenerator = DiagramGenerator()
+    private val configProcessor = ConfigProcessor()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +52,9 @@ class MainActivity : AppCompatActivity() {
         clearButton = findViewById(R.id.clearButton)
         resultsTextView = findViewById(R.id.resultsTextView)
         errorRecyclerView = findViewById(R.id.errorRecyclerView)
+        diagramScrollView = findViewById(R.id.diagramScrollView)
+        diagramCanvas = findViewById(R.id.diagramCanvas)
+        resultsScrollView = findViewById(R.id.resultsScrollView)
 
         errorAdapter = ErrorAdapter()
         errorRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -63,6 +75,8 @@ class MainActivity : AppCompatActivity() {
         resultsTextView.text = "Aquí se mostrarán los resultados..."
         errorAdapter.clearErrors()
         errorRecyclerView.visibility = View.GONE
+        diagramScrollView.visibility = View.GONE  // <-- CAMBIO
+        resultsScrollView.visibility = View.VISIBLE
     }
 
     private fun analyzeCode() {
@@ -73,84 +87,60 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        // Limpiar UI
         resultsTextView.text = ""
         errorAdapter.clearErrors()
         errorRecyclerView.visibility = View.GONE
+        diagramScrollView.visibility = View.GONE  // <-- CAMBIO
+        resultsScrollView.visibility = View.VISIBLE
 
+        // Análisis léxico
         val lexerResult = lexerAnalyzer.analyze(code)
-        Log.d("DEBUG", "Lexer: tokens=${lexerResult.tokens.size}, errores=${lexerResult.errores.size}, success=${lexerResult.success}")
+        Log.d("DEBUG", "Lexer: tokens=${lexerResult.tokens.size}, errores=${lexerResult.errores.size}")
 
         val parserResult = if (lexerResult.success) {
             parserAnalyzer.analyze(code)
         } else {
             ParserAnalyzer.ParserResult(emptyList(), false)
         }
-        Log.d("DEBUG", "Parser: errores=${parserResult.errores.size}, success=${parserResult.success}")
+        Log.d("DEBUG", "Parser: errores=${parserResult.errores.size}")
 
         val todosLosErrores = lexerResult.errores + parserResult.errores
         Log.d("DEBUG", "Total errores=${todosLosErrores.size}")
 
         if (todosLosErrores.isEmpty()) {
-            showSuccessResult(lexerResult.tokens)
+            showDiagram(lexerResult.tokens)
         } else {
             showErrorResult(todosLosErrores)
         }
     }
 
-    private fun showSuccessResult(tokens: List<TokenInfo>) {
-        val tokenList = tokens.joinToString("\n") { token ->
-            "  ${token.linea}:${token.columna} - ${token.nombre} (${token.valor})"
-        }
+    private fun showDiagram(tokens: List<TokenInfo>) {
+        try {
+            configProcessor.procesarTokens(tokens)
 
-        resultsTextView.text = """
-            ANÁLISIS EXITOSO
-            
-            Tokens encontrados: ${tokens.size}
-            
-            Lista de tokens:
-            $tokenList
-            
-            No se encontraron errores.
-            
-            El código es válido.
-        """.trimIndent()
+            val elementos = diagramGenerator.generarElementos(tokens)
+
+            diagramCanvas.setDiagrama(elementos) { id ->
+                configProcessor.getConfigParaElemento(id)
+            }
+
+            diagramScrollView.visibility = View.VISIBLE
+            resultsScrollView.visibility = View.GONE
+            resultsTextView.text = "ANÁLISIS EXITOSO - Mostrando diagrama"
+
+        } catch (e: Exception) {
+            Log.e("DEBUG", "Error al generar diagrama: ${e.message}")
+            resultsTextView.text = "Error al generar diagrama: ${e.message}"
+            resultsScrollView.visibility = View.VISIBLE
+        }
     }
 
     private fun showErrorResult(errores: List<ErrorInfo>) {
-        Log.d("DEBUG", "=== showErrorResult INICIADO ===")
-        Log.d("DEBUG", "Número de errores recibidos: ${errores.size}")
-
-        if (!::errorAdapter.isInitialized) {
-            Log.e("DEBUG", "ERROR: errorAdapter no inicializado")
-            return
-        }
-        if (!::errorRecyclerView.isInitialized) {
-            Log.e("DEBUG", "ERROR: errorRecyclerView no inicializado")
-            return
-        }
-
-        errores.forEachIndexed { index, error ->
-            Log.d("DEBUG", "Error[$index]: tipo=${error.tipo}, línea=${error.linea}, col=${error.columna}, token=${error.token}, mensaje=${error.mensaje}")
-        }
-
-        try {
-            errorAdapter.submitList(errores)
-            Log.d("DEBUG", "submitList ejecutado correctamente")
-        } catch (e: Exception) {
-            Log.e("DEBUG", "Excepción en submitList: ${e.message}")
-        }
-
+        errorAdapter.submitList(errores)
         errorRecyclerView.visibility = View.VISIBLE
-        Log.d("DEBUG", "RecyclerView visibility cambiado a VISIBLE")
-
-        resultsTextView.text = "SE ENCONTRARON ${errores.size} ERROR(ES)"
-        Log.d("DEBUG", "Texto de resultados actualizado")
-
-        errorRecyclerView.post {
-            errorRecyclerView.requestLayout()
-            Log.d("DEBUG", "requestLayout ejecutado en RecyclerView")
-        }
-
-        Log.d("DEBUG", "=== showErrorResult FINALIZADO ===")
+        diagramScrollView.visibility = View.GONE
+        resultsScrollView.visibility = View.GONE
+        resultsTextView.text = "❌ SE ENCONTRARON ${errores.size} ERROR(ES)"
     }
 }
